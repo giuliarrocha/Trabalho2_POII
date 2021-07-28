@@ -110,7 +110,22 @@ def main_window():
 
 ### Funções ###
 # def HookeJeeves ():
+
 # def Newton():
+def Newton(funcao, ponto_inicial):
+    x1, x2, x3, x4 = symbols('x1 x2 x3 x4')
+    init_printing(use_unicode=True)
+    ponto = []
+
+    # Pega os números da string ponto_inicial e coloca num vetor
+    for i in ponto_inicial:
+        if i.isdigit():
+            ponto.append(i)
+
+    # printei só para ver se esta dando certo
+    d1 = float(parser.parse(funcao).evaluate({'x1' : float(ponto[0]), 'x2' : float(ponto[1])})) 
+    print(d1)
+
 # def Gradiente ():
 # def FletcherPowell():
 # def DavidonFletcherPowell():
@@ -175,8 +190,9 @@ while True:
     if window == window2 and event == 'Calcular':
        print ("Hooke & Jeeves"); 
     
-    if window == window3 and event == 'Calcular':
-        print ("Newton"); 
+    if window == window3 and event == 'Calcular': 
+        funcao = str(parser.parse(valores['expressao']))
+        Newton(funcao, valores['ponto_inicial'])
 
     if window == window4 and event == 'Calcular':
         print ("Gradiente"); 
