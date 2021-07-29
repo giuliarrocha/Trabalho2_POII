@@ -14,9 +14,9 @@ parser = Parser()
 def window_hookeJeeves():
     layout = [[sg.Text('HOOKE & JEEVES', justification='center', font=('Arial', 11, 'bold'), text_color = '#921224')],
             [sg.Text('         ')],
-            [sg.Text('Insira a função:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='expressao', size=(30,1))],
+            [sg.Text('Insira a função:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='expressao', size=(35,1))],
             [sg.Text('Exemplo: x¹ = (0, 0) para R² o ponto inicial',  font=('Arial', 10, 'bold'), text_color = 'black')],
-            [sg.Text('x¹:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='ponto_inicial', size=(10,1))],
+            [sg.Text('x¹:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='ponto_inicial', size=(25,1))],
             [sg.Text('ε = ',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='epsilon', size=(10,1))],
             [sg.Text('         ')],
             [sg.Button('Calcular', size=(15,1)), sg.Button('Sair', size=(15,1))],
@@ -31,9 +31,9 @@ def window_hookeJeeves():
 def window_gradiente():
     layout = [[sg.Text('GRADIENTE', justification='center', font=('Arial', 11, 'bold'), text_color = '#921224')],
             [sg.Text('         ')],
-            [sg.Text('Insira a função:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='expressao', size=(30,1))],
+            [sg.Text('Insira a função:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='expressao', size=(35,1))],
             [sg.Text('Exemplo: x¹ = (0, 0) para R² o ponto inicial',  font=('Arial', 10, 'bold'), text_color = 'black')],
-            [sg.Text('x¹:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='ponto_inicial', size=(10,1))],
+            [sg.Text('x¹:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='ponto_inicial', size=(25,1))],
             [sg.Text('ε = ',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='epsilon', size=(10,1))],
             [sg.Text('         ')],
             [sg.Button('Calcular', size=(15,1)), sg.Button('Sair', size=(15,1))],
@@ -48,9 +48,9 @@ def window_gradiente():
 def window_fletcherReeves():
     layout = [[sg.Text('FLETCHER & REEVES', justification='center', font=('Arial', 11, 'bold'), text_color = '#921224')],
             [sg.Text('         ')],
-            [sg.Text('Insira a função:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='expressao', size=(30,1))],
+            [sg.Text('Insira a função:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='expressao', size=(35,1))],
             [sg.Text('Exemplo: x¹ = (0, 0) para R² o ponto inicial',  font=('Arial', 10, 'bold'), text_color = 'black')],
-            [sg.Text('x¹:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='ponto_inicial', size=(10,1))],
+            [sg.Text('x¹:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='ponto_inicial', size=(25,1))],
             [sg.Text('ε = ',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='epsilon', size=(10,1))],
             [sg.Text('         ')],
             [sg.Button('Calcular', size=(15,1)), sg.Button('Sair', size=(15,1))],
@@ -65,9 +65,9 @@ def window_fletcherReeves():
 def window_davidonFletcherPowell():
     layout = [[sg.Text('DAVIDON-FLETCHER-POWELL', justification='center', font=('Arial', 11, 'bold'), text_color = '#921224')],
             [sg.Text('         ')],
-            [sg.Text('Insira a função:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='expressao', size=(30,1))],
+            [sg.Text('Insira a função:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='expressao', size=(35,1))],
             [sg.Text('Exemplo: x¹ = (0, 0) para R² o ponto inicial',  font=('Arial', 10, 'bold'), text_color = 'black')],
-            [sg.Text('x¹:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='ponto_inicial', size=(10,1))],
+            [sg.Text('x¹:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='ponto_inicial', size=(25,1))],
             [sg.Text('ε = ',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='epsilon', size=(10,1))],
             [sg.Text('         ')],
             [sg.Button('Calcular', size=(15,1)), sg.Button('Sair', size=(15,1))],
@@ -82,9 +82,9 @@ def window_davidonFletcherPowell():
 def window_newton():
     layout = [[sg.Text('NEWTON', justification='center', font=('Arial', 11, 'bold'), text_color = '#921224')],
             [sg.Text('         ')],
-            [sg.Text('Insira a função:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='expressao', size=(30,1))],
+            [sg.Text('Insira a função:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='expressao', size=(35,1))],
             [sg.Text('Exemplo: x¹ = (0, 0) para R² o ponto inicial',  font=('Arial', 10, 'bold'), text_color = 'black')],
-            [sg.Text('x¹:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='ponto_inicial', size=(10,1))],
+            [sg.Text('x¹:',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='ponto_inicial', size=(25,1))],
             [sg.Text('ε = ',  font=('Arial', 10, 'bold'), text_color = 'black'), sg.Input(key='epsilon', size=(10,1))],
             [sg.Text('         ')],
             [sg.Button('Calcular', size=(15,1)), sg.Button('Sair', size=(15,1))],
@@ -123,7 +123,7 @@ def determinaVariaveisPontos(funcao, ponto_inicial):
     ponto_inicial = ponto_inicial.replace('(', '') #removendo ) e ( da string de pontos
     ponto_inicial = ponto_inicial.replace(')', '')   
     pontos_string = ponto_inicial.split(",") #separando os numeros pela virgula (,)
-    num_pontos = len(pontos) #conta o numero de pontos que foi colocado
+    num_pontos = len(pontos_string) #conta o numero de pontos que foi colocado
     pontos = [float(i) for i in pontos_string] #tranforma a lista de string em float
 
     return (variaveis, num_variaveis, pontos, num_pontos)
@@ -155,8 +155,14 @@ def Resultado(funcao, ponto):
 # def DavidonFletcherPowell():
 
 # Rotina - Newton
-# def Newton(funcao, ponto_inicial, epsilon):
-    
+def Newton(funcao, ponto_inicial, epsilon):
+    var_pontos = determinaVariaveisPontos(funcao, ponto_inicial)
+    variaveis = var_pontos[0]
+    num_variaveis = var_pontos[1]
+    pontos = var_pontos[2]
+    num_pontos = var_pontos[3]
+    print (variaveis, '\n', num_variaveis, '\n', pontos, '\n', num_pontos)
+
 
 # Rotina - Gradiente
 def Gradiente (funcao, ponto_inicial, epsilon):
