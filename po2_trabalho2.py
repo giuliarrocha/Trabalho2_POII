@@ -1,9 +1,11 @@
 import PySimpleGUI as sg
+from sympy.functions.combinatorial.numbers import nP
 from sympy.polys.polyoptions import Symbols
 from py_expression_eval import Parser
 from sympy import *
 from decimal import Decimal
 import math
+import numpy
 
 from sympy.solvers.diophantine.diophantine import length
 
@@ -128,26 +130,6 @@ def determinaVariaveisPontos(funcao, ponto_inicial):
 
     return (variaveis, num_variaveis, pontos, num_pontos)
 
-# Pegar resultado da função dada
-def Resultado(funcao, ponto):
-    if len(ponto) == 1:
-        print("até x1")
-        resultado = float(parser.parse(funcao).evaluate({'x1' : float(ponto[0])}))
-        pass
-    if len(ponto) == 2:
-        print("até x2")
-        resultado = float(parser.parse(funcao).evaluate({'x1' : float(ponto[0]), 'x2' : float(ponto[1])}))
-        pass
-    if len(ponto) == 3:
-        print("até x3")
-        resultado = float(parser.parse(funcao).evaluate({'x1' : float(ponto[0]), 'x2' : float(ponto[1]), 'x3' : float(ponto[2])}))
-        pass
-    if len(ponto) == 4:
-        print("até x4")
-        resultado = float(parser.parse(funcao).evaluate({'x1' : float(ponto[0]), 'x2' : float(ponto[1]), 'x3' : float(ponto[2]), 'x4' : float(ponto[3])}))
-        pass
-    return resultado
-
 # def HookeJeeves ():
 
 # def FletcherPowell():
@@ -167,32 +149,32 @@ def Newton(funcao, ponto_inicial, epsilon):
     resultado = float(parser.parse(funcao).evaluate(entrada))
 
 
-# Rotina - Gradiente
+# Rotina - Gradiente 2*x1+x2^2
 def Gradiente (funcao, ponto_inicial, epsilon):
-    x1, x2, x3, x4 = symbols('x1 x2 x3 x4')
-    init_printing(use_unicode=True)
-    ponto = []
-    fx = []
-    
-    # Pega os números da string ponto_inicial e coloca num vetor
-    for i in ponto_inicial:
-        if i.isdigit():
-            ponto.append(i)
+    var_pontos = determinaVariaveisPontos(funcao, ponto_inicial)
+    variaveis = var_pontos[0]
+    num_variaveis = var_pontos[1]
+    pontos = var_pontos[2]
+    num_pontos = var_pontos[3]
+    entrada={}
+    # Matriz Gradiente 
+    gradienteF = []
 
-    resultado = Resultado(funcao, ponto)
-    print(resultado)
+    for i in range(0, num_variaveis):
+            entrada[variaveis[i]] = pontos[i]
+    resultado = float(parser.parse(funcao).evaluate(entrada))
 
+    print(gradienteF)
+
+    # Algoritmo 
     if float(epsilon) > 0.0:
         k = 1
-        # derivada parcial
+    for i in range(0, num_variaveis):
+        derivada = str(diff(funcao, variaveis[i]))
+        gradienteF.append(derivada)
 
-        #for j in ponto+1:
-        #    print(j)
-        #    x = 'x' + str(j)
-        #    derivada = str(diff(funcao, x))
-        #    fx.append(derivada)
-        
-        #print(fx)
+    print(gradienteF)
+#    while abs(float()) >= epsilon:
 
 #Função para busca na reta (Newton):
 def MetodoNewton(funcao, a, b, epsilon):
