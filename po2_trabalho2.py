@@ -161,7 +161,11 @@ def Newton(funcao, ponto_inicial, epsilon):
     num_variaveis = var_pontos[1]
     pontos = var_pontos[2]
     num_pontos = var_pontos[3]
-    print (variaveis, '\n', num_variaveis, '\n', pontos, '\n', num_pontos)
+    entrada = {}
+    for i in range(0,num_variaveis):
+        entrada[variaveis[i]] = pontos[i]
+    resultado = float(parser.parse(funcao).evaluate(entrada))
+    print (resultado)
 
 
 # Rotina - Gradiente
