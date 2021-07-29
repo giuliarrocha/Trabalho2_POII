@@ -1,6 +1,6 @@
 import PySimpleGUI as sg
 from sympy.polys.polyoptions import Symbols
-from py_expression_eval import Expression, Parser
+from py_expression_eval import Parser
 from sympy import *
 from decimal import Decimal
 import math
@@ -8,6 +8,7 @@ import math
 from sympy.solvers.diophantine.diophantine import length
 
 sg.theme('LightBrown13')
+parser = Parser()
 
 ## Janelas
 def window_hookeJeeves():
@@ -111,6 +112,22 @@ def main_window():
 
 
 ### Funções ###
+
+#função que retorna uma lista com as variáveis, o número de variáveis, o número de pontos iniciais e os pontos
+def determinaVariaveisPontos(funcao, ponto_inicial):
+    variaveis = []
+    pontos_string = []
+    pontos = []
+    variaveis = parser.parse(funcao).variables() #Pega a função e retorna em uma lista as variaveis
+    num_variaveis = len(variaveis) #Retorna o numero de variaveis
+    ponto_inicial = ponto_inicial.replace('(', '') #removendo ) e ( da string de pontos
+    ponto_inicial = ponto_inicial.replace(')', '')   
+    pontos_string = ponto_inicial.split(",") #separando os numeros pela virgula (,)
+    num_pontos = len(pontos) #conta o numero de pontos que foi colocado
+    pontos = [float(i) for i in pontos_string] #tranforma a lista de string em float
+
+    return (variaveis, num_variaveis, pontos, num_pontos)
+
 # Pegar resultado da função dada
 def Resultado(funcao, ponto):
     if len(ponto) == 1:
@@ -133,8 +150,13 @@ def Resultado(funcao, ponto):
 
 # def HookeJeeves ():
 
-# def Newton():
+# def FletcherPowell():
 
+# def DavidonFletcherPowell():
+
+# Rotina - Newton
+# def Newton(funcao, ponto_inicial, epsilon):
+    
 
 # Rotina - Gradiente
 def Gradiente (funcao, ponto_inicial, epsilon):
@@ -162,10 +184,6 @@ def Gradiente (funcao, ponto_inicial, epsilon):
         #    fx.append(derivada)
         
         #print(fx)
-
-
-# def FletcherPowell():
-# def DavidonFletcherPowell():
 
 #Função para busca na reta (Newton):
 def MetodoNewton(funcao, a, b, epsilon):
@@ -228,7 +246,8 @@ while True:
        print ("Hooke & Jeeves"); 
     
     if window == window3 and event == 'Calcular': 
-        print ("Newton"); 
+        funcao = str(parser.parse(valores['expressao']))
+        Newton(funcao, valores['ponto_inicial'], valores['epsilon']) 
 
     if window == window4 and event == 'Calcular':
         funcao = str(parser.parse(valores['expressao']))
