@@ -5,7 +5,7 @@ from py_expression_eval import Parser
 from sympy import *
 from decimal import Decimal
 import math
-import numpy
+import numpy as np
 
 from sympy.solvers.diophantine.diophantine import length
 
@@ -157,24 +157,32 @@ def Gradiente (funcao, ponto_inicial, epsilon):
     pontos = var_pontos[2]
     num_pontos = var_pontos[3]
     entrada={}
-    # Matriz Gradiente 
-    gradienteF = []
+    gradienteF = np.empty((0, 0), dtype=np.float64)
+    grad = 0.0
 
     for i in range(0, num_variaveis):
             entrada[variaveis[i]] = pontos[i]
     resultado = float(parser.parse(funcao).evaluate(entrada))
-
-    print(gradienteF)
-
-    # Algoritmo 
+    
+    # Algoritmo #2*x1+x2^2
     if float(epsilon) > 0.0:
         k = 1
-    for i in range(0, num_variaveis):
+    for i in range(num_variaveis):
         derivada = str(diff(funcao, variaveis[i]))
-        gradienteF.append(derivada)
+        entrada[variaveis[i]] = pontos[i]
+        resultado = float(parser.parse(derivada).evaluate(entrada))
+        gradienteF = np.insert(gradienteF, i, resultado)
 
-    print(gradienteF)
-#    while abs(float()) >= epsilon:
+    # deixa matriz com uma coluna    
+    gradienteF = np.reshape(gradienteF, (num_variaveis, 1))
+
+    # calcula gradiente de F para iniciar o while
+    for i in range(len(gradienteF)):
+        grad += float(pow(gradienteF[i], 2))
+ 
+    while abs(sqrt(grad)) >= float(epsilon):
+        print("é maior que epsilon então posso começar")
+        break
 
 #Função para busca na reta (Newton):
 def MetodoNewton(funcao, a, b, epsilon):
