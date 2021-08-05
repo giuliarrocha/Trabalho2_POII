@@ -44,7 +44,8 @@ def window_gradiente():
             [sg.Text('         ')],
             [sg.Text(size=(40,1), key='respostaGradiente1',  font=('Arial', 11, 'bold'))],
             [sg.Text(size=(40,1), key='respostaGradiente2', text_color = 'black')],
-            [sg.Text(size=(40,1), key='respostaGradiente3', text_color = 'black')]
+            [sg.Text(size=(40,1), key='respostaGradiente3', text_color = 'black')],
+            [sg.Text(size=(40,1), key='respostaGradiente4', text_color = 'black')]
             ]
     return sg.Window('Gradiente', layout, size=(400, 400), finalize=True, resizable=True)
 
@@ -514,8 +515,7 @@ while True:
                 saida += ', '
         saida += ')^t'
         window4['respostaGradiente3'].update('x* = ' + saida)
-        # deixei comentado para evitar o erro enquanto não resolvo
-        # window4['respostaGradiente4'].update('f(x*) = %.4f' % resultado[2])
+        window4['respostaGradiente4'].update('f(x*) = %.4f' % resultado[2])
     if window == window5 and event == 'Calcular':
         funcao = str(parser.parse(valores['expressao']))
         FletcherReeves(funcao, valores['ponto_inicial'], valores['epsilon'])
