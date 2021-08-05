@@ -1,11 +1,12 @@
+from tkinter.constants import TRUE
 import PySimpleGUI as sg
 from sympy.functions.combinatorial.numbers import nP
 from sympy.polys.polyoptions import Symbols
 from py_expression_eval import Parser
 from sympy import *
-from decimal import Decimal
-import math
 import numpy as np
+import math
+from decimal import Decimal
 
 from sympy.solvers.diophantine.diophantine import length
 
@@ -138,15 +139,77 @@ def determinaVariaveisPontos(funcao, ponto_inicial):
 
 # Rotina - Newton
 def Newton(funcao, ponto_inicial, epsilon):
+    epsilon = float(epsilon)
     var_pontos = determinaVariaveisPontos(funcao, ponto_inicial)
     variaveis = var_pontos[0]
     num_variaveis = var_pontos[1]
     pontos = var_pontos[2]
     num_pontos = var_pontos[3]
+    if (num_variaveis!=num_pontos):
+        sg.popup_ok('Número de pontos de entrada não condiz com a quantidade de variáveis da função!')
+        return
     entrada = {}
     for i in range(0,num_variaveis):
         entrada[variaveis[i]] = pontos[i]
-    resultado = float(parser.parse(funcao).evaluate(entrada))
+    #resultado = float(parser.parse(funcao).evaluate(entrada))
+    continua = true
+    #Declarando matrizes
+    w = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    x = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    gradiente = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    gradienteX = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    gradienteX = np.array(gradienteX, float)
+    hessiana = [[0 for j in range(num_variaveis) ] for i in range(num_variaveis)]
+    hessianaX = [[0 for j in range(num_variaveis) ] for i in range(num_variaveis)]
+    hessianaX = np.array(hessianaX, float)
+    #(x1-2)^4+(x1-2*x2)^2
+    #calculo gradiente
+    for i in range(0,num_variaveis):
+        derivada = str(diff(funcao, variaveis[i]))
+        gradiente[i][0] = derivada
+    
+    #calculo hessiana
+    for i in range(0,num_variaveis):
+        for j in range(0,num_variaveis):
+            derivada = str(diff(gradiente[i][0], variaveis[j]))
+            hessiana[i][j] = derivada
+    
+    x = np.reshape(pontos, (num_variaveis, 1))
+
+    while (continua):
+        norma_grad = 0
+        norma_x = 0
+
+        #calcula gradiente(x)
+        for i in range(0,num_variaveis):
+            entrada[variaveis[i]] = x[i][0]
+
+        for i in range(0,num_variaveis):
+            resultado = np.longfloat(parser.parse(gradiente[i][0]).evaluate(entrada))
+            gradienteX[i][0] = resultado
+            norma_grad += resultado**2
+
+        norma_grad = math.sqrt(norma_grad)
+
+        if (norma_grad>=epsilon):
+            #calcula hessiana(x)
+            for i in range(0,num_variaveis):
+                for j in range(0,num_variaveis):
+                    resultado = float(parser.parse(hessiana[i][j]).evaluate(entrada))
+                    hessianaX[i][j] = resultado
+
+            H_inversa = np.linalg.inv(hessianaX)
+            w = H_inversa.dot((-1)*gradienteX)
+            x_anterior = x
+            x = w + x_anterior
+            for i in range (0, num_variaveis):
+                norma_x += ((x[i][0]-x_anterior[i][0])**2)
+            norma_x = math.sqrt(norma_x)
+            if (norma_x<epsilon):
+                continua = false
+        else:
+            continua=false
+    print(x)
 
 
 # Rotina - Gradiente 2*x1+x2^2
@@ -156,6 +219,9 @@ def Gradiente (funcao, ponto_inicial, epsilon):
     num_variaveis = var_pontos[1]
     pontos = var_pontos[2]
     num_pontos = var_pontos[3]
+    if (num_variaveis!=num_pontos):
+        sg.popup_ok('Número de pontos de entrada não condiz com a quantidade de variáveis da função!')
+        return
     entrada={}
     gradienteF = np.empty((0, 0), dtype=np.float64)
     grad = 0.0
@@ -186,6 +252,7 @@ def Gradiente (funcao, ponto_inicial, epsilon):
 
 #Função para busca na reta (Newton):
 def MetodoNewton(funcao, a, b, epsilon):
+    epsilon = float(epsilon)
     x, y, z = symbols('x y z')
     init_printing(use_unicode=True)
 
