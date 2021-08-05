@@ -95,7 +95,8 @@ def window_newton():
             [sg.Text('         ')],
             [sg.Text(size=(40,1), key='respostaNewton1',  font=('Arial', 11, 'bold'))],
             [sg.Text(size=(40,1), key='respostaNewton2', text_color = 'black')],
-            [sg.Text(size=(40,1), key='respostaNewton3', text_color = 'black')]
+            [sg.Text(size=(40,1), key='respostaNewton3', text_color = 'black')],
+            [sg.Text(size=(40,1), key='respostaNewton4', text_color = 'black')]
             ]
     return sg.Window('Newton', layout, size=(400, 400), finalize=True, resizable=True)
 
@@ -148,10 +149,12 @@ def Newton(funcao, ponto_inicial, epsilon):
     if (num_variaveis!=num_pontos):
         sg.popup_ok('Número de pontos de entrada não condiz com a quantidade de variáveis da função!')
         return
+
     entrada = {}
     for i in range(0,num_variaveis):
         entrada[variaveis[i]] = pontos[i]
-    #resultado = float(parser.parse(funcao).evaluate(entrada))
+
+    k=-1
     continua = true
     #Declarando matrizes
     w = [[0 for j in range(1) ] for i in range(num_variaveis)]
@@ -162,7 +165,7 @@ def Newton(funcao, ponto_inicial, epsilon):
     hessiana = [[0 for j in range(num_variaveis) ] for i in range(num_variaveis)]
     hessianaX = [[0 for j in range(num_variaveis) ] for i in range(num_variaveis)]
     hessianaX = np.array(hessianaX, float)
-    #(x1-2)^4+(x1-2*x2)^2
+    
     #calculo gradiente
     for i in range(0,num_variaveis):
         derivada = str(diff(funcao, variaveis[i]))
@@ -192,6 +195,7 @@ def Newton(funcao, ponto_inicial, epsilon):
         norma_grad = math.sqrt(norma_grad)
 
         if (norma_grad>=epsilon):
+            k+=1
             #calcula hessiana(x)
             for i in range(0,num_variaveis):
                 for j in range(0,num_variaveis):
@@ -209,8 +213,15 @@ def Newton(funcao, ponto_inicial, epsilon):
                 continua = false
         else:
             continua=false
-    print(x)
+    
+    for i in range(0,num_variaveis):
+            entrada[variaveis[i]] = x[i][0]
+    y = float(parser.parse(funcao).evaluate(entrada))
+    return (k, x, y, num_variaveis)
 
+    #Alguns testes:
+    #(x1-2)^4+(x1-2*x2)^2 com (0,3) e e=0.1
+    #(x1+3)^2+(x2-1)^3 com (0,2) e e=0.01 ==> x = (-3, 1,0313)
 
 # Rotina - Gradiente 2*x1+x2^2
 def Gradiente (funcao, ponto_inicial, epsilon):
@@ -313,7 +324,19 @@ while True:
     
     if window == window3 and event == 'Calcular': 
         funcao = str(parser.parse(valores['expressao']))
-        Newton(funcao, valores['ponto_inicial'], valores['epsilon']) 
+        resultado = Newton(funcao, valores['ponto_inicial'], valores['epsilon'])
+        window3['respostaNewton1'].update('RESULTADO: ')
+        window3['respostaNewton2'].update('Com K variando de 0 a %d' % resultado[0])
+        saida = '('
+        for i in range (0, resultado[3]):
+            #(x1+3)^2+(x2-1)^3
+            valor = "{:.4f}".format(float(resultado[1][i]))
+            saida += str(valor)
+            if (i!=resultado[3]-1):
+                saida += ', '
+        saida += ')^t'
+        window3['respostaNewton3'].update('x* = ' + saida)
+        window3['respostaNewton4'].update('f(x*) = %.4f' % resultado[2])
 
     if window == window4 and event == 'Calcular':
         funcao = str(parser.parse(valores['expressao']))
