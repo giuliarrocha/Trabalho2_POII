@@ -223,46 +223,113 @@ def Newton(funcao, ponto_inicial, epsilon):
     #(x1-2)^4+(x1-2*x2)^2 com (0,3) e e=0.1
     #(x1+3)^2+(x2-1)^3 com (0,2) e e=0.01 ==> x = (-3, 1,0313)
 
-# Rotina - Gradiente 2*x1+x2^2
+# Rotina - Gradiente
 def Gradiente (funcao, ponto_inicial, epsilon):
     var_pontos = determinaVariaveisPontos(funcao, ponto_inicial)
     variaveis = var_pontos[0]
     num_variaveis = var_pontos[1]
     pontos = var_pontos[2]
     num_pontos = var_pontos[3]
+    norma_grad = 0.0
+    k = 0
+
     if (num_variaveis!=num_pontos):
         sg.popup_ok('Número de pontos de entrada não condiz com a quantidade de variáveis da função!')
         return
-    entrada={}
-    gradienteF = np.empty((0, 0), dtype=np.float64)
-    grad = 0.0
 
-    for i in range(0, num_variaveis):
-            entrada[variaveis[i]] = pontos[i]
-    resultado = float(parser.parse(funcao).evaluate(entrada))
-    
-    # Algoritmo #2*x1+x2^2
+    entrada = {}
+    for i in range(0,num_variaveis):
+        entrada[variaveis[i]] = pontos[i]
+
+    #Declarando matrizes
+    x = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    gradiente = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    gradienteF = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    gradienteF = np.array(gradienteF, float)
+    d = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    min_f = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    novo_x = [[0 for j in range(1) ] for i in range(num_variaveis)]
+
+    # Calculo do gradiente
+    for i in range(0,num_variaveis):
+        derivada = str(diff(funcao, variaveis[i]))
+        gradiente[i][0] = derivada
+
+    # Deixa matriz X como coluna
+    x = np.reshape(pontos, (num_variaveis, 1))
+ 
     if float(epsilon) > 0.0:
         k = 1
-    for i in range(num_variaveis):
-        derivada = str(diff(funcao, variaveis[i]))
-        entrada[variaveis[i]] = pontos[i]
-        resultado = float(parser.parse(derivada).evaluate(entrada))
-        gradienteF = np.insert(gradienteF, i, resultado)
+    # fazer um else caso não precise entrar no algoritmo
 
-    # deixa matriz com uma coluna    
-    gradienteF = np.reshape(gradienteF, (num_variaveis, 1))
+    
+    # Calcular o gradiente de F
+    for i in range(0,num_variaveis):
+        entrada[variaveis[i]] = x[i][0]
 
-    # calcula gradiente de F para iniciar o while
-    for i in range(len(gradienteF)):
-        grad += float(pow(gradienteF[i], 2))
- 
-    while abs(sqrt(grad)) >= float(epsilon):
-        print("é maior que epsilon então posso começar")
-        break
+    for i in range(0,num_variaveis):
+        resultado = np.longfloat(parser.parse(gradiente[i][0]).evaluate(entrada))
+        gradienteF[i][0] = resultado
+        norma_grad += resultado**2
+    norma_grad = math.sqrt(norma_grad)
+
+    while(float(norma_grad) > float(epsilon)):
+        # zera a variavel da norma
+        norma_grad = 0.0
+
+        # Calcula direção
+        for i in range(0,num_variaveis):
+            d[i][0] = - gradienteF[i][0]
+
+        # Calcula a função de min f(x+lambda*d)
+        for i in range(0,num_variaveis):
+            min_f[i][0] = '(' + str(x[i][0]) + '+' + str(d[i][0]) + '*x' + ')'
+
+        # Substituir na função os valores da função min f
+        nova_funcao = funcao
+        for i in range(0,num_variaveis):
+            nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
+     
+        # Determina o valor de lambda
+        l = float(MetodoNewton(nova_funcao, 0, 0.0001))
+        
+        # Substituir x pelo valor de lambda
+        for i in range(0,num_variaveis):
+            novo_x[i][0] = min_f[i][0]
+            novo_x[i][0] = min_f[i][0].replace('x', str(l))
+            resultado = np.longfloat(parser.parse(novo_x[i][0]).evaluate(entrada))
+            novo_x[i][0] = float(resultado)
+        
+        # Calcular o gradiente de F e coloca o novo x na matrix x
+        for i in range(0,num_variaveis):
+            entrada[variaveis[i]] = novo_x[i][0]
+            x[i][0] = novo_x[i][0]
+
+        # Calcula a norma para a condição do while
+        for i in range(0,num_variaveis):
+            resultado = np.longfloat(parser.parse(gradiente[i][0]).evaluate(entrada))
+            gradienteF[i][0] = resultado
+            norma_grad += resultado**2
+        norma_grad = math.sqrt(norma_grad)
+        
+        # incrementa o número de iterações
+        k = k + 1    
+
+    #Determina valor de f(x)
+    for i in range(0,num_variaveis):
+            entrada[variaveis[i]] = x[i][0]
+    y = float(parser.parse(funcao).evaluate(entrada))
+
+    print('valor de x: ', x, 'k = ', k, 'y = ', y)
+
+    #return (k, x, y, num_variaveis)
+
+    # (x1-2)^4+(x1-2*x2)^2 0,3 0.1 ==> (2.2680, 1.1433) k = 10
+    # x1^2-2*x1*x2+4*x2^2 1, 0.25 0.1 ==> (0.0625, 0.015625) k = 5
+    # 2*x1^2+(x2-1)^2  0, 0 0.1 ==> (0, 1) k = 2
 
 #Função para busca na reta (Newton):
-def MetodoNewton(funcao, a, b, epsilon):
+def MetodoNewton(funcao, a, epsilon):
     epsilon = float(epsilon)
     x, y, z = symbols('x y z')
     init_printing(use_unicode=True)
@@ -289,7 +356,7 @@ def MetodoNewton(funcao, a, b, epsilon):
         else:
             break
         l = l + 1
-    return (k[len(k)-1], l)
+    return (k[len(k)-1])
 
 window1, window2, window3, window4, window5, window6, window7 = main_window(), None, None, None, None, None, None
 parser = Parser()
@@ -341,9 +408,5 @@ while True:
     if window == window4 and event == 'Calcular':
         funcao = str(parser.parse(valores['expressao']))
         Gradiente(funcao, valores['ponto_inicial'], valores['epsilon'])
-
-    if window == window5 and event == 'Calcular':
-        print ("Fletcher & Reeves"); 
-    
     if window == window6 and event == 'Calcular':
         print ("Davidon-Fletcher-Powell"); 
