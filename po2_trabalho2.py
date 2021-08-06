@@ -62,7 +62,8 @@ def window_fletcherReeves():
             [sg.Text('         ')],
             [sg.Text(size=(40,1), key='respostaFletcher1',  font=('Arial', 11, 'bold'))],
             [sg.Text(size=(40,1), key='respostaFletcher2', text_color = 'black')],
-            [sg.Text(size=(40,1), key='respostaFletcher3', text_color = 'black')]
+            [sg.Text(size=(40,1), key='respostaFletcher3', text_color = 'black')],
+            [sg.Text(size=(40,1), key='respostaFletcher4', text_color = 'black')]
             ]
     return sg.Window('Fletcher & Reeves', layout, size=(400, 400), finalize=True, resizable=True)
 
@@ -143,6 +144,7 @@ def FletcherReeves(funcao, ponto_inicial, epsilon):
     num_variaveis = var_pontos[1]
     pontos = var_pontos[2]
     num_pontos = var_pontos[3]
+    k = 0
     if (num_variaveis!=num_pontos):
         sg.popup_ok('Número de pontos de entrada não condiz com a quantidade de variáveis da função!')
         return
@@ -154,8 +156,10 @@ def FletcherReeves(funcao, ponto_inicial, epsilon):
     #Declarando matrizes
     x = [[0 for j in range(1) ] for i in range(num_variaveis)]
     gradiente = [[0 for j in range(1) ] for i in range(num_variaveis)]
-    g = [[0 for j in range(1) ] for i in range(num_variaveis)]
-    g = np.array(g, float)
+    g_atual = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    g_atual = np.array(g_atual, float)
+    g_prox = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    g_prox = np.array(g_prox, float)
     d = [[0 for j in range(1) ] for i in range(num_variaveis)]
     min_f = [[0 for j in range(1) ] for i in range(num_variaveis)]
     novo_x = [[0 for j in range(1) ] for i in range(num_variaveis)]
@@ -169,71 +173,115 @@ def FletcherReeves(funcao, ponto_inicial, epsilon):
     # Deixa matriz X como coluna
     x = np.reshape(pontos, (num_variaveis, 1))
 
-    if float(epsilon) > 0.0:
-        k = 0
-    # fazer um else caso não precise entrar no algoritmo
-
-
-    # Calcular o gradiente de F
+    # Calcular o gradiente atual e a norma
     for i in range(0,num_variaveis):
         entrada[variaveis[i]] = x[i][0]
 
     for i in range(0,num_variaveis):
         resultado = np.longfloat(parser.parse(gradiente[i][0]).evaluate(entrada))
-        g[i][0] = resultado
+        g_atual[i][0] = resultado
         norma_grad += resultado**2
     norma_grad = math.sqrt(norma_grad)
 
-    while(float(norma_grad) > float(epsilon)):
-        for i in range(0, num_variaveis-1):
-            # zera a variavel da norma
-            norma_grad = 0.0
-            
-            # Calcula direção
-            for i in range(0,num_variaveis):
-                d[i][0] = - g[i][0]
+    # Calcula direção
+    for i in range(0,num_variaveis):
+        d[i][0] = float(- g_atual[i][0])
 
-            # Faz o formato da função de min f(x+lambda*d)
-            for i in range(0,num_variaveis):
-                min_f[i][0] = '(' + str(x[i][0]) + '+' + str(d[i][0]) + '*x' + ')'
+    passo = 1
 
-            # Substituir na função os valores da função min f
-            nova_funcao = funcao
-            for i in range(0,num_variaveis):
-                nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
+    while passo != 0:
+        if passo == 1:
+            if(float(norma_grad) > float(epsilon)):
+                k = 0
+                passo = 2
+            else:
+                #Determina valor de f(x)
+                for i in range(0,num_variaveis):
+                        entrada[variaveis[i]] = x[i][0]
+                y = float(parser.parse(funcao).evaluate(entrada))
+                return (k, x, y, num_variaveis)
+        if passo == 2:
+            for i in range(0, num_variaveis-1):
+                # zera a variavel da norma
+                norma_grad = 0.0
+
+                # Faz o formato da função de min f(x+lambda*d)
+                for i in range(0,num_variaveis):
+                    min_f[i][0] = '(' + str(x[i][0]) + '+' + str(d[i][0]) + '*x' + ')'
+
+                # Substituir na função os valores da função min f
+                nova_funcao = funcao
+                for i in range(0,num_variaveis):
+                    nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
         
-            # Determina o valor de lambda
-            l = float(MetodoNewton(nova_funcao, 0, 0.0001))
+                # Determina o valor de lambda
+                l = float(MetodoNewton(nova_funcao, x[0][0], 0.001))
+                print( 'lambdas:', l)
+                
+                # Substituir x pelo valor de lambda e coloca o resultado na matriz novo_x
+                for i in range(0,num_variaveis):
+                    novo_x[i][0] = min_f[i][0]
+                    novo_x[i][0] = min_f[i][0].replace('x', str(l))
+                    resultado = np.longfloat(parser.parse(novo_x[i][0]).evaluate(entrada))
+                    novo_x[i][0] = float(resultado)
             
-            # Substituir x pelo valor de lambda
-            for i in range(0,num_variaveis):
-                novo_x[i][0] = min_f[i][0]
-                novo_x[i][0] = min_f[i][0].replace('x', str(l))
-                resultado = np.longfloat(parser.parse(novo_x[i][0]).evaluate(entrada))
-                novo_x[i][0] = float(resultado)
-            
-            # Calcular o gradiente G e coloca o novo x na matrix x
+                # Coloca os valores do novo_x na matrix x
+                for i in range(0,num_variaveis):
+                    entrada[variaveis[i]] = novo_x[i][0]
+                    x[i][0] = novo_x[i][0]
+
+                # Calcular o gradiente próximo
+                for i in range(0,num_variaveis):
+                    entrada[variaveis[i]] = x[i][0]
+
+                for i in range(0,num_variaveis):
+                    resultado = np.longfloat(parser.parse(gradiente[i][0]).evaluate(entrada))
+                    g_prox[i][0] = resultado
+                
+                if k < (num_variaveis-1):
+                    # Calcula beta
+                    g_atualTransposta = np.transpose(g_atual) 
+                    g_proxTransposta = np.transpose(g_prox)
+                    b = float(g_proxTransposta.dot(g_prox) / g_atualTransposta.dot(g_atual))
+
+                    # Calcula a nova direção
+                    for i in range(0,num_variaveis):
+                        d[i][0] = float( - g_prox[i][0] + b*d[i][0])
+                    k = k + 1
+                else:
+                    k = k + 1
+                    passo = 3
+        if passo == 3:
+            norma_grad = 0.0
+            # xn vai ser x0
             for i in range(0,num_variaveis):
                 entrada[variaveis[i]] = novo_x[i][0]
                 x[i][0] = novo_x[i][0]
 
-            # Calcula a norma para a condição do while
+            # Calcular o gradiente atual e a norma
+            for i in range(0,num_variaveis):
+                entrada[variaveis[i]] = x[i][0]
+
             for i in range(0,num_variaveis):
                 resultado = np.longfloat(parser.parse(gradiente[i][0]).evaluate(entrada))
-                g[i][0] = resultado
+                g_atual[i][0] = resultado
                 norma_grad += resultado**2
-            norma_grad = math.sqrt(norma_grad) 
-            print(x)
-            if k < (num_variaveis-1):
-                print('achar beta')
-            else:
-                for i in range(0,num_variaveis):
-                    entrada[variaveis[i]] = novo_x[i][0]
-                    x[i][0] = novo_x[i][0]
-        k = k + 1
-        break
-   # (x1-2)^4+(x1-2*x2)^2
+            norma_grad = math.sqrt(norma_grad)
 
+            # Calcula direção
+            for i in range(0,num_variaveis):
+                d[i][0] = float(- g_atual[i][0])
+
+            passo = 1
+    
+    #Determina valor de f(x)
+    for i in range(0,num_variaveis):
+        entrada[variaveis[i]] = x[i][0]
+    y = float(parser.parse(funcao).evaluate(entrada))
+    return (k, x, y, num_variaveis)        
+    # (x1-2)^4+(x1-2*x2)^2
+    # x1^3-x1^2+2*x2^2-2*x2
+    # x1^3-2*x1*x2+x2^2
 # def DavidonFletcherPowell():
 def DecomposicaoLU (A, X, B, ordem):
     L = [[0 for j in range(ordem) ] for i in range(ordem)]
@@ -456,13 +504,11 @@ def Gradiente (funcao, ponto_inicial, epsilon):
     # (x1-2)^4+(x1-2*x2)^2 0,3 0.1 ==> (2.2680, 1.1433) k = 10
     # x1^2-2*x1*x2+4*x2^2 1, 0.25 0.1 ==> (0.0625, 0.015625) k = 5
     # 2*x1^2+(x2-1)^2  0, 0 0.1 ==> (0, 1) k = 2
+    # 4*x1^2+2*x1*x2+2*x2^2+x1+x2  1,1  0.01 ==> (-0.0716, -0,2139) k = 6
 
 #Função para busca na reta (Newton):
 def MetodoNewton(funcao, a, epsilon):
     epsilon = float(epsilon)
-    x, y, z = symbols('x y z')
-    init_printing(use_unicode=True)
-
     x = a
     deriv1 = str(diff(funcao))
     d1 = float(parser.parse(deriv1).evaluate({'x' : x}))    
@@ -485,6 +531,8 @@ def MetodoNewton(funcao, a, epsilon):
         else:
             break
         l = l + 1
+
+    print(k)
     return (k[len(k)-1])
 
 window1, window2, window3, window4, window5, window6, window7 = main_window(), None, None, None, None, None, None
@@ -551,6 +599,18 @@ while True:
         window4['respostaGradiente4'].update('f(x*) = %.4f' % resultado[2])
     if window == window5 and event == 'Calcular':
         funcao = str(parser.parse(valores['expressao']))
-        FletcherReeves(funcao, valores['ponto_inicial'], valores['epsilon'])
+        resultado =  FletcherReeves(funcao, valores['ponto_inicial'], valores['epsilon'])
+        window5['respostaFletcher1'].update('RESULTADO: ')
+        window5['respostaFletcher2'].update('Com K variando de 0 a %d' % resultado[0])
+        saida = '('
+        for i in range (0, resultado[3]):
+            #(x1+3)^2+(x2-1)^3
+            valor = "{:.4f}".format(float(resultado[1][i]))
+            saida += str(valor)
+            if (i!=resultado[3]-1):
+                saida += ', '
+        saida += ')^t'
+        window5['respostaFletcher3'].update('x* = ' + saida)
+        window5['respostaFletcher4'].update('f(x*) = %.4f' % resultado[2])
     if window == window6 and event == 'Calcular':
         print ("Davidon-Fletcher-Powell"); 
