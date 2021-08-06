@@ -235,6 +235,41 @@ def FletcherReeves(funcao, ponto_inicial, epsilon):
    # (x1-2)^4+(x1-2*x2)^2
 
 # def DavidonFletcherPowell():
+def DecomposicaoLU (A, X, B, ordem):
+    L = [[0 for j in range(ordem) ] for i in range(ordem)]
+    U = [[0 for j in range(ordem) ] for i in range(ordem)]
+    Y = [[0 for j in range(1) ] for i in range(ordem)]
+    for i in range (0, ordem):
+        #linhas de U
+        for j in range (i, ordem):
+            soma = 0
+            for k in range (0, i):
+                soma += L[i][k]*U[k][j]
+            U[i][j] = A[i][j] - soma
+        #Colunas de L
+        for j in range (i, ordem):
+            soma = 0
+            for k in range (0, i):
+                soma += L[j][k]*U[k][i]
+            L[j][i] = (A[j][i]-soma)/U[i][i]
+    
+    #resolvendo sistema triangular inferior
+    Y[0][0] = B[0][0]/L[0][0]
+    for i in range (1, ordem):
+        Y[i][0] = B[i][0]
+        for j in range (0, i):
+            Y[i][0] -= L[i][j]*Y[j][0]
+        Y[i][0] /= L[i][i]
+    
+    #SistemaTriangularInferior(ordem,L,b,y);
+    #resolvendo sistema triangular superior
+    X[ordem-1][0] = Y[ordem-1][0]/U[ordem-1][ordem-1]
+    for i in range (ordem-2, -1, -1):
+        X[i][0] = Y[i][0]
+        for j in range (i+1, ordem):
+            X[i][0] -= U[i][j]*X[j][0]
+        X[i][0] /= U[i][i]
+	#SistemaTriangularSuperior(ordem,U,y,x);
 
 # Rotina - Newton
 def Newton(funcao, ponto_inicial, epsilon):
@@ -291,7 +326,6 @@ def Newton(funcao, ponto_inicial, epsilon):
             norma_grad += resultado**2
 
         norma_grad = math.sqrt(norma_grad)
-
         if (norma_grad>=epsilon):
             k+=1
             #calcula hessiana(x)
@@ -299,9 +333,8 @@ def Newton(funcao, ponto_inicial, epsilon):
                 for j in range(0,num_variaveis):
                     resultado = float(parser.parse(hessiana[i][j]).evaluate(entrada))
                     hessianaX[i][j] = resultado
-
-            H_inversa = np.linalg.inv(hessianaX)
-            w = H_inversa.dot((-1)*gradienteX)
+            #resolvendo sistema por decomposicao LU
+            DecomposicaoLU(hessianaX, w, ((-1)*gradienteX), num_variaveis)
             x_anterior = x
             x = w + x_anterior
             for i in range (0, num_variaveis):
