@@ -191,40 +191,52 @@ def FletcherReeves(funcao, ponto_inicial, epsilon):
         # Calcula direção
         for i in range(0,num_variaveis):
             d[i][0] = float(- g_atual[i][0])
+
         for k in range(0, num_variaveis):
+            
             # Faz o formato da função de min f(x+lambda*d)
             for i in range(0,num_variaveis):
                 min_f[i][0] = '(' + str(x[i][0]) + '+' + str(d[i][0]) + '*x' + ')'
+            
             # Substituir na função os valores da função min f
             nova_funcao = str(funcao)
+            
             for i in range(0,num_variaveis):
                 nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
+            
             # Determina o valor de lambda
-            l = float(MetodoNewton(nova_funcao, x[0][0]))   
+            l = float(MetodoNewton(nova_funcao, 0))   
             print('lambda: ', l)           
+            
             # Substituir x pelo valor de lambda e coloca o resultado na matriz novo_x
             for i in range(0,num_variaveis):
                 novo_x[i][0] = min_f[i][0]
                 novo_x[i][0] = min_f[i][0].replace('x', str(l))
                 resultado = np.longfloat(parser.parse(novo_x[i][0]).evaluate(entrada))
                 novo_x[i][0] = float(resultado)
+            
             # Calcular o gradiente próximo
             for i in range(0,num_variaveis):
                 entrada[variaveis[i]] = novo_x[i][0]
             for i in range(0,num_variaveis):
                 resultado = np.longfloat(parser.parse(str(gradiente[i][0])).evaluate(entrada))
                 g_prox[i][0] = resultado  
+            
             if k < (num_variaveis - 1):
                 g_atualTransposta = np.transpose(g_atual) 
                 g_proxTransposta = np.transpose(g_prox)
                 b = float(float(g_proxTransposta.dot(g_prox)) / float(g_atualTransposta.dot(g_atual)))
+            
                 # Calcula a nova direção
                 for i in range(0,num_variaveis):
                     d[i][0] = float( - g_prox[i][0] + b*d[i][0])
+            
             # Coloca os valores do novo_x na matrix x
             for i in range(0,num_variaveis):
                 entrada[variaveis[i]] = novo_x[i][0]
                 x[i][0] = novo_x[i][0]
+
+        # Determina o gradiente e a norma para testar na condição de parada do while
         for i in range(0,num_variaveis):
             entrada[variaveis[i]] = x[i][0]
         for i in range(0,num_variaveis):
