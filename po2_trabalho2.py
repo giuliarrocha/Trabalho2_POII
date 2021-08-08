@@ -26,9 +26,10 @@ def window_hookeJeeves():
             [sg.Button('Calcular', size=(15,1)), sg.Button('Sair', size=(15,1))],
             [sg.Text('         ')],
             [sg.Text('         ')],
-            [sg.Text(size=(40,1), key='respostaHooke1',  font=('Arial', 11, 'bold'))],
-            [sg.Text(size=(40,1), key='respostaHooke2', text_color = 'black')],
-            [sg.Text(size=(40,1), key='respostaHooke3', text_color = 'black')]
+            [sg.Text(size=(40,1), key='respostaHookeJeeves1',  font=('Arial', 11, 'bold'))],
+            [sg.Text(size=(40,1), key='respostaHookeJeeves2', text_color = 'black')],
+            [sg.Text(size=(40,1), key='respostaHookeJeeves3', text_color = 'black')],
+            [sg.Text(size=(40,1), key='respostaHookeJeeves4', text_color = 'black')]
             ]
     return sg.Window('Hooke & Jeeves', layout, size=(400, 400), finalize=True, resizable=True)
 
@@ -81,7 +82,8 @@ def window_davidonFletcherPowell():
             [sg.Text('         ')],
             [sg.Text(size=(40,1), key='respostaDavidon1',  font=('Arial', 11, 'bold'))],
             [sg.Text(size=(40,1), key='respostaDavidon2', text_color = 'black')],
-            [sg.Text(size=(40,1), key='respostaDavidon3', text_color = 'black')]
+            [sg.Text(size=(40,1), key='respostaDavidon3', text_color = 'black')],
+            [sg.Text(size=(40,1), key='respostaDavidon4', text_color = 'black')]
             ]
     return sg.Window('Davidon-Fletcher-Powell', layout, size=(400, 400), finalize=True, resizable=True)
 
@@ -135,7 +137,104 @@ def determinaVariaveisPontos(funcao, ponto_inicial):
 
     return (variaveis, num_variaveis, pontos, num_pontos)
 
-# def HookeJeeves ():
+# Rotina - Hooke & Jeeves
+def HookeJeeves(funcao, ponto_inicial, epsilon):
+    epsilon = float(epsilon)
+    var_pontos = determinaVariaveisPontos(funcao, ponto_inicial)
+    variaveis = var_pontos[0]
+    num_variaveis = var_pontos[1]
+    pontos = var_pontos[2]
+    num_pontos = var_pontos[3]
+    
+    entrada = {}
+    for i in range(0,num_variaveis):
+        entrada[variaveis[i]] = pontos[i]
+        
+    if (num_variaveis!=num_pontos):
+        sg.popup_ok('Número de pontos de entrada não condiz com a quantidade de variáveis da função!')
+        return
+    if (epsilon <= 0.0):
+        sg.popup_ok('Epsilon inválido!')
+        return
+    
+    y = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    x = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    x_anterior = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    d = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    d = np.array(d, float)
+    min_f = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    
+    for i in range(0,num_variaveis):
+        entrada[variaveis[i]] = x[i][0]
+
+    # Deixa matriz y e x como coluna
+    y = np.reshape(pontos, (num_variaveis, 1))
+    x = np.reshape(pontos, (num_variaveis, 1))
+
+    k = 1
+    j = 0
+    continua = True
+    
+    while(continua and k < 100):
+        # Passo 1: Busca exploratória
+        # Para j = 0 até j = num_variaveis-1
+        for j in range(0,num_variaveis):
+            nova_funcao = funcao
+            for i in range(0,num_variaveis):
+                # Atualiza direção
+                d[i][0] = i==j
+                min_f[i][0] = '(' + str(y[i][0]) + '+(' + str(d[i][0]) + ')*(x))'
+                # Substituir na função os valores da função min f
+                nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
+            
+            # Determina o valor de lambda
+            l = float(MetodoNewton(nova_funcao, x[0][0]))
+            # Substituir y pelo valor de lambda e atualizar y
+            for i in range(0,num_variaveis):
+                nova_funcao = min_f[i][0].replace('x', str(l))
+                resultado = np.longfloat(parser.parse(nova_funcao).evaluate(entrada))
+                y[i][0] = float(resultado)
+                entrada[variaveis[i]] = y[i][0]
+            if(j == num_variaveis-1):
+                soma = 0.0
+                for i in range(0,num_variaveis):
+                    x_anterior[i][0] = x[i][0]
+                    x[i][0] = y[i][0]
+                    soma += (x[i][0] - x_anterior[i][0])**2
+                if(math.sqrt(soma) < epsilon):
+                    continua = False
+                else:
+                    # Passo 2: Busca conjugada
+                    nova_funcao = funcao
+                    for i in range(0,num_variaveis):
+                        # Atualiza direção
+                        d[i][0] = x[i][0] - x_anterior[i][0]
+                        
+                        min_f[i][0] = '(' + str(x[i][0]) + '+(' + str(d[i][0]) + ')*(x))'
+                    
+                        # Substituir na função os valores da função min f
+                        nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
+                    # Determina o valor de lambda
+                    l = float(MetodoNewton(nova_funcao, x[0][0]))
+                    # y^(j+1) = y^j + l_j * d^j
+                    # Substituir y pelo valor de lambda e atualizar y
+                    for i in range(0,num_variaveis):
+                        nova_funcao = min_f[i][0].replace('x', str(l))
+                        resultado = np.longfloat(parser.parse(nova_funcao).evaluate(entrada))
+                        y[i][0] = float(resultado)
+                        entrada[variaveis[i]] = y[i][0]
+                    j = 0
+                    k = k + 1
+
+    for i in range(0,num_variaveis):
+            entrada[variaveis[i]] = x[i][0]
+    y = float(parser.parse(funcao).evaluate(entrada))
+    
+    return (k, x, y, num_variaveis)
+        
+    #Alguns testes:
+    # (x1-2)^4+(x1-2*x2)^2 (0, 3) 0.1 ==> (2, 1) k = 4
+    # (1-x1)^2+5*(x2-x1^2)^2 (2, 0) 0.1
 
 # Rotina - Fletcher & Reeves
 def FletcherReeves(funcao, ponto_inicial, epsilon):
@@ -250,7 +349,167 @@ def FletcherReeves(funcao, ponto_inicial, epsilon):
     # x1^3-x1^2+2*x2^2-2*x2
     # x1^3-2*x1*x2+x2^2
 
-# def DavidonFletcherPowell():
+# Rotina - Davidon, Fletcher & Powell
+def simetrica(a, rtol=1e-05, atol=1e-08):
+    return np.allclose(a, a.T, rtol=rtol, atol=atol)
+def definida_positiva(a):
+    return np.all(np.linalg.eigvals(a) > 0)
+def DavidonFletcherPowell(funcao, ponto_inicial, epsilon):
+    epsilon = float(epsilon)
+    var_pontos = determinaVariaveisPontos(funcao, ponto_inicial)
+    variaveis = var_pontos[0]
+    num_variaveis = var_pontos[1]
+    pontos = var_pontos[2]
+    num_pontos = var_pontos[3]
+    
+    if (num_variaveis!=num_pontos):
+        sg.popup_ok('Número de pontos de entrada não condiz com a quantidade de variáveis da função!')
+        return
+    if (epsilon <= 0.0):
+        sg.popup_ok('Epsilon inválido!')
+        return
+    
+
+    entrada = {}
+    for i in range(0,num_variaveis):
+        entrada[variaveis[i]] = pontos[i]
+    
+    #Declarando matrizes
+    x = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    gradiente = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    g = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    g = np.array(g, float)
+    p = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    p = np.array(p, float)
+    q = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    q = np.array(q, float)
+    d = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    d = np.array(d, float)
+    novo_g = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    novo_g = np.array(novo_g, float)
+    min_f = [[0 for j in range(1) ] for i in range(num_variaveis)]
+    norma_grad = 0.0
+    
+    i = 0
+    k = 0
+    # Calculo do gradiente
+    for c in range(0,num_variaveis):
+        derivada = str(diff(funcao, variaveis[c]))
+        gradiente[c][0] = derivada
+        
+    
+    # Deixa matriz X como coluna
+    x = np.reshape(pontos, (num_variaveis, 1))
+
+    for c in range(0,num_variaveis):
+        entrada[variaveis[c]] = x[c][0]
+            
+
+    # Matriz simétrica definida positiva inicial
+    s = [[0 for j in range(num_variaveis) ] for i in range(num_variaveis)]
+    
+    for c in range(0,num_variaveis):
+        for c1 in range(0,num_variaveis):
+            s[c][c1] = (c == c1)
+
+    # Calcula novo gradiente
+    norma_grad = 0.0
+    for c in range(0,num_variaveis):
+        g[c][0] = np.longfloat(parser.parse(gradiente[c][0]).evaluate(entrada))
+        norma_grad += g[c][0]**2
+    norma_grad = math.sqrt(norma_grad)
+    
+    while(i < 100):
+        
+        
+        if(float(norma_grad) < float(epsilon)):
+            break
+        
+        # Calcula direção
+        for c in range(0,num_variaveis):
+            soma = 0.0
+            for c1 in range(0,num_variaveis):
+                soma += s[c][c1] * g[c1][0]
+            d[c][0] = - soma
+        
+        # Faz o formato da função de min f(x+lambda*d)
+        nova_funcao = funcao
+        for c in range(0,num_variaveis):
+            min_f[c][0] = '(' + str(x[c][0]) + '+(' + str(d[c][0]) + ')*x)'
+        
+            # Substituir na função os valores da função min f
+            nova_funcao = nova_funcao.replace(str(variaveis[c]), str(min_f[c][0]))
+        
+        # Determina o valor de lambda
+        l = float(MetodoNewton(nova_funcao, x[0][0]))
+        
+        # Substituir x pelo valor de lambda e atualizar x
+        for c in range(0,num_variaveis):
+            nova_funcao = min_f[c][0].replace('x', str(l))
+            resultado = np.longfloat(parser.parse(nova_funcao).evaluate(entrada))
+            x[c][0] = float(resultado)
+            entrada[variaveis[c]] = x[c][0]
+            
+        # Atualiza gradiente
+        norma_grad = 0.0
+        for c in range(0,num_variaveis):
+            novo_g[c][0] = np.longfloat(parser.parse(gradiente[c][0]).evaluate(entrada))
+            norma_grad += novo_g[c][0]**2
+        norma_grad = math.sqrt(norma_grad)
+        
+        if(k < num_variaveis-1):
+            
+            for c in range(0,num_variaveis):
+                # qk = g^(k+1)
+                q[c][0] = novo_g[c][0] - g[c][0]
+                # atualiza gradiente
+                g[c][0] = novo_g[c][0]
+                # pk = l_kd^k
+                p[c][0] = l * d[c][0]
+            
+            auxa = np.dot(s,q);
+            auxb = np.dot(auxa,q.T)
+            auxa = np.dot(auxb,s)
+            
+            auxb = np.dot(q.T,s)
+            auxc = np.dot(auxb,q)
+            
+            auxb = np.dot(p.T,q)
+                              
+            s = s + (p.dot(p.T))/(auxb[0][0]) - (auxa)/(auxc[0][0])
+            
+            # simetrica
+            if(not simetrica(s)):
+                return -1
+            # definida positiva
+            if(not definida_positiva(s)):
+                return -1
+            k = k + 1
+        else:
+            # Atualiza x, i, g, k
+            # x já atualizado
+            # Matriz simétrica definida positiva inicial
+            for c in range(0,num_variaveis):
+                # atualiza gradiente
+                g[c][0] = novo_g[c][0]
+                for c1 in range(0,num_variaveis):
+                    # Atualliza matriz inicial
+                    s[c][c1] = (c == c1)
+            i = i + 1
+            k = 0
+        
+    for c in range(0,num_variaveis):
+            entrada[variaveis[c]] = x[c][0]
+    y = float(parser.parse(funcao).evaluate(entrada))
+    
+    return (i, x, y, num_variaveis)
+        
+    #Alguns testes:
+    # x1^2-x1*x2+x2^2-2*x1+x2 (0, 0) 0.1 ==> (0.9998, -0.0002) I = 1
+    # (x1-2)^4+(x1-2*x2)^2 (0, 3) 0.1 ==> (2.25, 1.13) I = [0,2]
+    # 3*x1^2+x1*x2+1.5*x2^2-10*x1+4*x2 (1,1) 0.01 ==> (2, -2) f(x)=-14
+
+
 def DecomposicaoLU (A, X, B, ordem):
     L = [[0 for j in range(ordem) ] for i in range(ordem)]
     U = [[0 for j in range(ordem) ] for i in range(ordem)]
@@ -529,7 +788,19 @@ while True:
         window6.move(window1.current_location()[0] + 50, window1.current_location()[1] + 50)
 
     if window == window2 and event == 'Calcular':
-       print ("Hooke & Jeeves"); 
+       funcao = str(parser.parse(valores['expressao']))
+       resultado = HookeJeeves(funcao, valores['ponto_inicial'], valores['epsilon'])
+       window2['respostaHookeJeeves1'].update('RESULTADO: ')
+       window2['respostaHookeJeeves2'].update('Com K variando de 1 a %d' % resultado[0])
+       saida = '('
+       for i in range (0, resultado[3]):
+           valor = "{:.4f}".format(float(resultado[1][i]))
+           saida += str(valor)
+           if (i!=resultado[3]-1):
+               saida += ', '
+       saida += ')^t'
+       window2['respostaHookeJeeves3'].update('x* = ' + saida)
+       window2['respostaHookeJeeves4'].update('f(x*) = %.4f' % resultado[2])
     
     if window == window3 and event == 'Calcular': 
         funcao = str(parser.parse(valores['expressao']))
@@ -578,4 +849,16 @@ while True:
        # window5['respostaFletcher3'].update('x* = ' + saida)
         #window5['respostaFletcher4'].update('f(x*) = %.4f' % resultado[2])
     if window == window6 and event == 'Calcular':
-        print ("Davidon-Fletcher-Powell"); 
+        funcao = str(parser.parse(valores['expressao']))
+        resultado =  DavidonFletcherPowell(funcao, valores['ponto_inicial'], valores['epsilon'])
+        window6['respostaDavidon1'].update('RESULTADO: ')
+        window6['respostaDavidon2'].update('Com I variando de 0 a %d' % resultado[0])
+        saida = '('
+        for i in range (0, resultado[3]):
+            valor = "{:.4f}".format(float(resultado[1][i]))
+            saida += str(valor)
+            if (i!=resultado[3]-1):
+                saida += ', '
+        saida += ')^t'
+        window6['respostaDavidon3'].update('x* = ' + saida)
+        window6['respostaDavidon4'].update('f(x*) = %.4f' % resultado[2])
