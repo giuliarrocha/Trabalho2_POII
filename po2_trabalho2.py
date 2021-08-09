@@ -151,11 +151,13 @@ def HookeJeeves(funcao, ponto_inicial, epsilon):
         entrada[variaveis[i]] = pontos[i]
         
     if (num_variaveis!=num_pontos):
+        k = -1
         sg.popup_ok('Número de pontos de entrada não condiz com a quantidade de variáveis da função!')
-        return
+        return (k, k, k, k)
     if (epsilon <= 0.0):
+        k = -1
         sg.popup_ok('Epsilon inválido!')
-        return
+        return (k, k, k, k)
     
     y = [[0 for j in range(1) ] for i in range(num_variaveis)]
     x = [[0 for j in range(1) ] for i in range(num_variaveis)]
@@ -372,11 +374,13 @@ def DavidonFletcherPowell(funcao, ponto_inicial, epsilon):
     num_pontos = var_pontos[3]
     
     if (num_variaveis!=num_pontos):
+        k = -1
         sg.popup_ok('Número de pontos de entrada não condiz com a quantidade de variáveis da função!')
-        return
+        return (k, k, k, k)
     if (epsilon <= 0.0):
+        k = -1
         sg.popup_ok('Epsilon inválido!')
-        return
+        return (k, k, k, k)
     
 
     entrada = {}
@@ -428,9 +432,7 @@ def DavidonFletcherPowell(funcao, ponto_inicial, epsilon):
         norma_grad += g[c][0]**2
     norma_grad = math.sqrt(norma_grad)
     
-    while(i < 100):
-        
-        
+    while(i < 100):        
         if(float(norma_grad) < float(epsilon)):
             break
         
@@ -807,18 +809,21 @@ while True:
     if window == window2 and event == 'Calcular':
        funcao = str(parser.parse(valores['expressao']))
        resultado = HookeJeeves(funcao, valores['ponto_inicial'], valores['epsilon'])
-       
-       window2['respostaHookeJeeves1'].update('RESULTADO: ')
-       window2['respostaHookeJeeves2'].update('Com K variando de 1 a %d' % resultado[0])
-       saida = '('
-       for i in range (0, resultado[3]):
-           valor = "{:.4f}".format(float(resultado[1][i]))
-           saida += str(valor)
-           if (i!=resultado[3]-1):
-               saida += ', '
-       saida += ')^t'
-       window2['respostaHookeJeeves3'].update('x* = ' + saida)
-       window2['respostaHookeJeeves4'].update('f(x*) = %.4f' % resultado[2])
+       if(resultado[0] != -1):
+           window2['respostaHookeJeeves1'].update('RESULTADO: ')
+           saida = 'Com K variando de 1 a %d' % resultado[0]
+           if(resultado[0]==100):
+               saida += ' (máximo de iterações)'
+           window2['respostaHookeJeeves2'].update(saida)
+           saida = '('
+           for i in range (0, resultado[3]):
+               valor = "{:.4f}".format(float(resultado[1][i]))
+               saida += str(valor)
+               if (i!=resultado[3]-1):
+                   saida += ', '
+           saida += ')^t'
+           window2['respostaHookeJeeves3'].update('x* = ' + saida)
+           window2['respostaHookeJeeves4'].update('f(x*) = %.4f' % resultado[2])
     
     if window == window3 and event == 'Calcular': 
         funcao = str(parser.parse(valores['expressao']))
@@ -870,14 +875,18 @@ while True:
     if window == window6 and event == 'Calcular':
         funcao = str(parser.parse(valores['expressao']))
         resultado =  DavidonFletcherPowell(funcao, valores['ponto_inicial'], valores['epsilon'])
-        window6['respostaDavidon1'].update('RESULTADO: ')
-        window6['respostaDavidon2'].update('Com I variando de 0 a %d' % resultado[0])
-        saida = '('
-        for i in range (0, resultado[3]):
-            valor = "{:.4f}".format(float(resultado[1][i]))
-            saida += str(valor)
-            if (i!=resultado[3]-1):
-                saida += ', '
-        saida += ')^t'
-        window6['respostaDavidon3'].update('x* = ' + saida)
-        window6['respostaDavidon4'].update('f(x*) = %.4f' % resultado[2])
+        if(resultado[0] != -1):
+            window6['respostaDavidon1'].update('RESULTADO: ')
+            saida = 'Com I variando de 0 a %d' % resultado[0]
+            if(resultado[0]==100):
+                saida += ' (máximo de iterações)'
+            window6['respostaDavidon2'].update(saida)
+            saida = '('
+            for i in range (0, resultado[3]):
+                valor = "{:.4f}".format(float(resultado[1][i]))
+                saida += str(valor)
+                if (i!=resultado[3]-1):
+                    saida += ', '
+            saida += ')^t'
+            window6['respostaDavidon3'].update('x* = ' + saida)
+            window6['respostaDavidon4'].update('f(x*) = %.4f' % resultado[2])
