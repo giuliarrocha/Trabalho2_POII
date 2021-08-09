@@ -265,7 +265,8 @@ def FletcherReeves(funcao, ponto_inicial, epsilon):
     min_f = [[0 for j in range(1) ] for i in range(num_variaveis)]
     novo_x = [[0 for j in range(1) ] for i in range(num_variaveis)]
     norma_grad = 0.0
-    
+    m = 1
+
     # Calculo do gradiente
     for i in range(0,num_variaveis):
         derivada = str(diff(funcao, variaveis[i]))
@@ -303,9 +304,8 @@ def FletcherReeves(funcao, ponto_inicial, epsilon):
             for i in range(0,num_variaveis):
                 nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
             
-            # Determina o valor de lambda
-            l = float(MetodoNewton(nova_funcao, 0))   
-            print('lambda: ', l)           
+            # Determina o valor de lambda ---> DEIXEI COMO 0
+            l = float(MetodoNewton(nova_funcao, 0))        
             
             # Substituir x pelo valor de lambda e coloca o resultado na matriz novo_x
             for i in range(0,num_variaveis):
@@ -343,8 +343,13 @@ def FletcherReeves(funcao, ponto_inicial, epsilon):
             g_atual[i][0] = resultado
             norma_grad += math.pow(resultado, 2)
         norma_grad = math.sqrt(norma_grad)
+        m = m + 1
 
-    print('x: ', x)
+    #Determina valor de f(x)
+    for i in range(0,num_variaveis):
+            entrada[variaveis[i]] = x[i][0]
+    y = float(parser.parse(funcao).evaluate(entrada))
+    return (m, x, y, num_variaveis)
     # (x1-2)^4+(x1-2*x2)^2
     # x1^3-x1^2+2*x2^2-2*x2
     # x1^3-2*x1*x2+x2^2
@@ -734,28 +739,29 @@ def Gradiente (funcao, ponto_inicial, epsilon):
     # 4*x1^2+2*x1*x2+2*x2^2+x1+x2  1,1  0.01 ==> (-0.0716, -0,2139) k = 6
 
 #Função para busca na reta (Newton):
-def MetodoNewton(funcao, a):
-    x = a
+def MetodoNewton(funcao, x):
+    k = []
+    x = float(x)
     deriv1 = str(diff(funcao))
     d1 = float(parser.parse(deriv1).evaluate({'x' : x}))    
-    k = []
+    j = 0
     k.append(x)
     l = 0
     
-    while abs(float(d1)) >= 0.00001:
+    while abs(d1) >= 0.00001:
         deriv2 = str(diff(deriv1))
         d2 = float(parser.parse(deriv2).evaluate({'x' : x}))
         if d2 != 0.0:
             x = float(k[len(k)-1] - (d1 / d2))
             k.append(x)
 
-            if(float((abs(k[len(k)-1] - k[len(k)-2]) / max(1, abs(k[len(k)-2])))) < 0.00001):         
+            if float(abs(k[len(k)-1] - k[len(k)-2]) / max(1, abs(k[len(k)-1]))) < 0.00001:         
                 break
             else:
                 d1 = float(parser.parse(deriv1).evaluate({'x' : x}))
         else:
             break
-        
+        j = j + 1
         l = l + 1
     return (k[len(k)-1])
 
@@ -835,19 +841,19 @@ while True:
         window4['respostaGradiente4'].update('f(x*) = %.4f' % resultado[2])
     if window == window5 and event == 'Calcular':
         funcao = str(parser.parse(valores['expressao']))
-        FletcherReeves(funcao, valores['ponto_inicial'], valores['epsilon'])
-        #window5['respostaFletcher1'].update('RESULTADO: ')
-        #window5['respostaFletcher2'].update('Com K variando de 0 a %d' % resultado[0])
-        #saida = '('
-        #for i in range (0, resultado[3]):
+        resultado = FletcherReeves(funcao, valores['ponto_inicial'], valores['epsilon'])
+        window5['respostaFletcher1'].update('RESULTADO: ')
+        window5['respostaFletcher2'].update('Com K variando de 0 a %d' % resultado[0])
+        saida = '('
+        for i in range (0, resultado[3]):
             #(x1+3)^2+(x2-1)^3
-        #    valor = "{:.4f}".format(float(resultado[1][i]))
-        #    saida += str(valor)
-        #    if (i!=resultado[3]-1):
-        #        saida += ', '
-        #saida += ')^t'
-       # window5['respostaFletcher3'].update('x* = ' + saida)
-        #window5['respostaFletcher4'].update('f(x*) = %.4f' % resultado[2])
+            valor = "{:.4f}".format(float(resultado[1][i]))
+            saida += str(valor)
+            if (i!=resultado[3]-1):
+                saida += ', '
+        saida += ')^t'
+        window5['respostaFletcher3'].update('x* = ' + saida)
+        window5['respostaFletcher4'].update('f(x*) = %.4f' % resultado[2])
     if window == window6 and event == 'Calcular':
         funcao = str(parser.parse(valores['expressao']))
         resultado =  DavidonFletcherPowell(funcao, valores['ponto_inicial'], valores['epsilon'])
