@@ -248,8 +248,13 @@ def FletcherReeves(funcao, ponto_inicial, epsilon):
     num_pontos = var_pontos[3]
     k = 0
     if (num_variaveis!=num_pontos):
+        k = -1
         sg.popup_ok('Número de pontos de entrada não condiz com a quantidade de variáveis da função!')
-        return
+        return (k, k, k, k)
+    if (epsilon <= 0.0):
+        k = -1
+        sg.popup_ok('Epsilon inválido!')
+        return (k, k, k, k)
 
     entrada = {}
     for i in range(0,num_variaveis):
