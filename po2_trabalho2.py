@@ -189,7 +189,7 @@ def HookeJeeves(funcao, ponto_inicial, epsilon):
                 nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
             
             # Determina o valor de lambda ---> Aceita lambda negativo
-            l = float(FiltraMetodoNewton(nova_funcao, x[0][0]))
+            l = float(MetodoNewton(nova_funcao, x[0][0]))
             
             # Substituir y pelo valor de lambda e atualizar y
             for i in range(0,num_variaveis):
@@ -217,7 +217,7 @@ def HookeJeeves(funcao, ponto_inicial, epsilon):
                         # Substituir na função os valores da função min f
                         nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
                     # Determina o valor de lambda ---> Aceita lambda negativo
-                    l = float(FiltraMetodoNewton(nova_funcao, x[0][0]))
+                    l = float(MetodoNewton(nova_funcao, x[0][0]))
                     # y^(j+1) = y^j + l_j * d^j
                     # Substituir y pelo valor de lambda e atualizar y
                     for i in range(0,num_variaveis):
@@ -648,7 +648,7 @@ def Gradiente (funcao, ponto_inicial, epsilon):
         k = -1
         sg.popup_ok('Número de pontos de entrada não condiz com a quantidade de variáveis da função!')
         return (k, k, k, k)
-    if (epsilon <= 0.0):
+    if (float(epsilon) <= 0.0):
         k = -1
         sg.popup_ok('Epsilon inválido!')
         return (k, k, k, k)
@@ -704,12 +704,8 @@ def Gradiente (funcao, ponto_inicial, epsilon):
         for i in range(0,num_variaveis):
             nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
      
-        # Determina o valor de lambda ---> Se lambda negativo não pode continuar
-            l = float(FiltraMetodoNewton(nova_funcao, x[0][0]))
-            if(l < 0):
-                sg.popup_ok('Não foi encontrado um lambda positivo! Insira um novo ponto inicial.')
-                m = -1
-                return (m, m, m, m)
+        # Determina o valor de lambda 
+            l = float(MetodoNewton(nova_funcao, x[0][0]))
         
         # Substituir x pelo valor de lambda
         for i in range(0,num_variaveis):
