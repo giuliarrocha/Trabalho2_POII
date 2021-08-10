@@ -189,8 +189,12 @@ def HookeJeeves(funcao, ponto_inicial, epsilon):
                 # Substituir na função os valores da função min f
                 nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
             
-            # Determina o valor de lambda
-            l = float(MetodoNewton(nova_funcao, x[0][0]))
+            # Determina o valor de lambda ---> Se lambda negativo não pode continuar
+            l = float(FiltraMetodoNewton(nova_funcao, x[0][0]))
+            if(l < 0):
+                sg.popup_ok('Não foi encontrado um lambda positivo! Insira um novo ponto inicial.')
+                m = -1
+                return (m, m, m, m)
             # Substituir y pelo valor de lambda e atualizar y
             for i in range(0,num_variaveis):
                 nova_funcao = min_f[i][0].replace('x', str(l))
@@ -216,8 +220,12 @@ def HookeJeeves(funcao, ponto_inicial, epsilon):
                     
                         # Substituir na função os valores da função min f
                         nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
-                    # Determina o valor de lambda
-                    l = float(MetodoNewton(nova_funcao, x[0][0]))
+                    # Determina o valor de lambda ---> Se lambda negativo não pode continuar
+                    l = float(FiltraMetodoNewton(nova_funcao, x[0][0]))
+                    if(l < 0):
+                        sg.popup_ok('Não foi encontrado um lambda positivo! Insira um novo ponto inicial.')
+                        m = -1
+                        return (m, m, m, m) 
                     # y^(j+1) = y^j + l_j * d^j
                     # Substituir y pelo valor de lambda e atualizar y
                     for i in range(0,num_variaveis):
@@ -233,10 +241,6 @@ def HookeJeeves(funcao, ponto_inicial, epsilon):
     y = float(parser.parse(funcao).evaluate(entrada))
     
     return (k, x, y, num_variaveis)
-        
-    #Alguns testes:
-    # (x1-2)^4+(x1-2*x2)^2 (0, 3) 0.1 ==> (2, 1) k = 4
-    # (1-x1)^2+5*(x2-x1^2)^2 (2, 0) 0.1
 
 # Rotina - Fletcher & Reeves
 def FletcherReeves(funcao, ponto_inicial, epsilon):
@@ -311,10 +315,10 @@ def FletcherReeves(funcao, ponto_inicial, epsilon):
             for i in range(0,num_variaveis):
                 nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
             
-            # Determina o valor de lambda ---> DEIXEI COMO 0
+            # Determina o valor de lambda ---> Se lambda negativo não pode continuar
             l = float(FiltraMetodoNewton(nova_funcao, x[0][0]))
             if(l < 0):
-                sg.popup_ok('Não foi encontrado um lambda positivo!')
+                sg.popup_ok('Não foi encontrado um lambda positivo! Insira um novo ponto inicial.')
                 m = -1
                 return (m, m, m, m)
             
@@ -361,9 +365,6 @@ def FletcherReeves(funcao, ponto_inicial, epsilon):
             entrada[variaveis[i]] = x[i][0]
     y = float(parser.parse(funcao).evaluate(entrada))
     return (m, x, y, num_variaveis)
-    # (x1-2)^4+(x1-2*x2)^2
-    # x1^3-x1^2+2*x2^2-2*x2
-    # x1^3-2*x1*x2+x2^2
 
 # Rotina - Davidon, Fletcher & Powell
 def simetrica(a, rtol=1e-05, atol=1e-08):
@@ -386,7 +387,6 @@ def DavidonFletcherPowell(funcao, ponto_inicial, epsilon):
         k = -1
         sg.popup_ok('Epsilon inválido!')
         return (k, k, k, k)
-    
 
     entrada = {}
     for i in range(0,num_variaveis):
@@ -415,14 +415,12 @@ def DavidonFletcherPowell(funcao, ponto_inicial, epsilon):
         derivada = str(diff(funcao, variaveis[c]))
         gradiente[c][0] = derivada
         
-    
     # Deixa matriz X como coluna
     x = np.reshape(pontos, (num_variaveis, 1))
 
     for c in range(0,num_variaveis):
         entrada[variaveis[c]] = x[c][0]
             
-
     # Matriz simétrica definida positiva inicial
     s = [[0 for j in range(num_variaveis) ] for i in range(num_variaveis)]
     
@@ -455,9 +453,13 @@ def DavidonFletcherPowell(funcao, ponto_inicial, epsilon):
         
             # Substituir na função os valores da função min f
             nova_funcao = nova_funcao.replace(str(variaveis[c]), str(min_f[c][0]))
-        
-        # Determina o valor de lambda
-        l = float(MetodoNewton(nova_funcao, x[0][0]))
+
+        # Determina o valor de lambda ---> Se lambda negativo não pode continuar
+        l = float(FiltraMetodoNewton(nova_funcao, x[0][0]))
+        if(l < 0):
+            sg.popup_ok('Não foi encontrado um lambda positivo! Insira um novo ponto inicial.')
+            m = -1
+            return (m, m, m, m) 
         
         # Substituir x pelo valor de lambda e atualizar x
         for c in range(0,num_variaveis):
@@ -513,19 +515,13 @@ def DavidonFletcherPowell(funcao, ponto_inicial, epsilon):
                     s[c][c1] = (c == c1)
             i = i + 1
             k = 0
-        
+    # Determina valor de f(x*)
     for c in range(0,num_variaveis):
             entrada[variaveis[c]] = x[c][0]
     y = float(parser.parse(funcao).evaluate(entrada))
     
     return (i, x, y, num_variaveis)
         
-    #Alguns testes:
-    # x1^2-x1*x2+x2^2-2*x1+x2 (0, 0) 0.1 ==> (0.9998, -0.0002) I = 1
-    # (x1-2)^4+(x1-2*x2)^2 (0, 3) 0.1 ==> (2.25, 1.13) I = [0,2]
-    # 3*x1^2+x1*x2+1.5*x2^2-10*x1+4*x2 (1,1) 0.01 ==> (2, -2) f(x)=-14
-
-
 def DecomposicaoLU (A, X, B, ordem):
     L = [[0 for j in range(ordem) ] for i in range(ordem)]
     U = [[0 for j in range(ordem) ] for i in range(ordem)]
@@ -641,10 +637,6 @@ def Newton(funcao, ponto_inicial, epsilon):
     y = float(parser.parse(funcao).evaluate(entrada))
     return (k, x, y, num_variaveis)
 
-    #Alguns testes:
-    #(x1-2)^4+(x1-2*x2)^2 com (0,3) e e=0.1
-    #(x1+3)^2+(x2-1)^3 com (0,2) e e=0.01 ==> x = (-3, 1,0313)
-
 # Rotina - Gradiente
 def Gradiente (funcao, ponto_inicial, epsilon):
     var_pontos = determinaVariaveisPontos(funcao, ponto_inicial)
@@ -682,9 +674,7 @@ def Gradiente (funcao, ponto_inicial, epsilon):
  
     if float(epsilon) > 0.0:
         k = 1
-    # fazer um else caso não precise entrar no algoritmo
 
-    
     # Calcular o gradiente de F
     for i in range(0,num_variaveis):
         entrada[variaveis[i]] = x[i][0]
@@ -694,7 +684,6 @@ def Gradiente (funcao, ponto_inicial, epsilon):
         gradienteF[i][0] = resultado
         norma_grad += resultado**2
     norma_grad = math.sqrt(norma_grad)
-
 
     while(float(norma_grad) > float(epsilon)):
         # zera a variavel da norma
@@ -713,8 +702,12 @@ def Gradiente (funcao, ponto_inicial, epsilon):
         for i in range(0,num_variaveis):
             nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
      
-        # Determina o valor de lambda
-        l = float(MetodoNewton(nova_funcao, x[0][0]))
+        # Determina o valor de lambda ---> Se lambda negativo não pode continuar
+            l = float(FiltraMetodoNewton(nova_funcao, x[0][0]))
+            if(l < 0):
+                sg.popup_ok('Não foi encontrado um lambda positivo! Insira um novo ponto inicial.')
+                m = -1
+                return (m, m, m, m)
         
         # Substituir x pelo valor de lambda
         for i in range(0,num_variaveis):
@@ -743,11 +736,6 @@ def Gradiente (funcao, ponto_inicial, epsilon):
             entrada[variaveis[i]] = x[i][0]
     y = float(parser.parse(funcao).evaluate(entrada))
     return (k, x, y, num_variaveis)
-
-    # (x1-2)^4+(x1-2*x2)^2 0,3 0.1 ==> (2.2680, 1.1433) k = 10
-    # x1^2-2*x1*x2+4*x2^2 1, 0.25 0.1 ==> (0.0625, 0.015625) k = 5
-    # 2*x1^2+(x2-1)^2  0, 0 0.1 ==> (0, 1) k = 2
-    # 4*x1^2+2*x1*x2+2*x2^2+x1+x2  1,1  0.01 ==> (-0.0716, -0,2139) k = 6
 
 #Filtra o método de Newton:
 def FiltraMetodoNewton(funcao, x):
