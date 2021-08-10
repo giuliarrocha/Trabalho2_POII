@@ -188,12 +188,9 @@ def HookeJeeves(funcao, ponto_inicial, epsilon):
                 # Substituir na função os valores da função min f
                 nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
             
-            # Determina o valor de lambda ---> Se lambda negativo não pode continuar
+            # Determina o valor de lambda ---> Aceita lambda negativo
             l = float(FiltraMetodoNewton(nova_funcao, x[0][0]))
-            if(l < 0):
-                sg.popup_ok('Não foi encontrado um lambda positivo! Insira um novo ponto inicial.')
-                m = -1
-                return (m, m, m, m)
+            
             # Substituir y pelo valor de lambda e atualizar y
             for i in range(0,num_variaveis):
                 nova_funcao = min_f[i][0].replace('x', str(l))
@@ -219,12 +216,8 @@ def HookeJeeves(funcao, ponto_inicial, epsilon):
                     
                         # Substituir na função os valores da função min f
                         nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
-                    # Determina o valor de lambda ---> Se lambda negativo não pode continuar
+                    # Determina o valor de lambda ---> Aceita lambda negativo
                     l = float(FiltraMetodoNewton(nova_funcao, x[0][0]))
-                    if(l < 0):
-                        sg.popup_ok('Não foi encontrado um lambda positivo! Insira um novo ponto inicial.')
-                        m = -1
-                        return (m, m, m, m) 
                     # y^(j+1) = y^j + l_j * d^j
                     # Substituir y pelo valor de lambda e atualizar y
                     for i in range(0,num_variaveis):
