@@ -8,7 +8,6 @@ import numpy as np
 import math
 from decimal import Decimal
 from sympy.solvers import solve
-
 from sympy.solvers.diophantine.diophantine import length, norm
 
 sg.theme('LightBrown13')
@@ -485,7 +484,7 @@ def DavidonFletcherPowell(funcao, ponto_inicial, epsilon):
                 # pk = l_kd^k
                 p[c][0] = l * d[c][0]
             
-            auxa = np.dot(s,q);
+            auxa = np.dot(s,q)
             auxb = np.dot(auxa,q.T)
             auxa = np.dot(auxb,s)
             
@@ -567,8 +566,13 @@ def Newton(funcao, ponto_inicial, epsilon):
     pontos = var_pontos[2]
     num_pontos = var_pontos[3]
     if (num_variaveis!=num_pontos):
+        k = -1
         sg.popup_ok('Número de pontos de entrada não condiz com a quantidade de variáveis da função!')
-        return
+        return (k, k, k, k)
+    if (epsilon <= 0.0):
+        k = -1
+        sg.popup_ok('Epsilon inválido!')
+        return (k, k, k, k)
 
     entrada = {}
     for i in range(0,num_variaveis):
@@ -648,8 +652,13 @@ def Gradiente (funcao, ponto_inicial, epsilon):
     k = 0
 
     if (num_variaveis!=num_pontos):
+        k = -1
         sg.popup_ok('Número de pontos de entrada não condiz com a quantidade de variáveis da função!')
-        return
+        return (k, k, k, k)
+    if (epsilon <= 0.0):
+        k = -1
+        sg.popup_ok('Epsilon inválido!')
+        return (k, k, k, k)
 
     entrada = {}
     for i in range(0,num_variaveis):
