@@ -159,9 +159,11 @@ Ao inserir o ponto inicial para as funções, utilizar parênteses e vírgula en
 
 
 EXEMPLO PARA MÉTODO DE NEWTON:
+
 ![Fotos 10_08_2021 17_35_12](https://user-images.githubusercontent.com/85367213/128931688-04aa6b8a-724d-4ebe-bb9a-1293a1312ee0.png)
 
 
 O exemplo acima deve ser inserido como na imagem abaixo: 
+
 ![Newton 10_08_2021 17_36_12](https://user-images.githubusercontent.com/85367213/128931716-e3ddd16f-ba13-43f5-a09b-d329617ab969.png)
 
