@@ -642,7 +642,7 @@ def Gradiente (funcao, ponto_inicial, epsilon):
     pontos = var_pontos[2]
     num_pontos = var_pontos[3]
     norma_grad = 0.0
-    k = 0
+    m = 0
 
     if (num_variaveis!=num_pontos):
         k = -1
@@ -675,7 +675,7 @@ def Gradiente (funcao, ponto_inicial, epsilon):
     x = np.reshape(pontos, (num_variaveis, 1))
  
     if float(epsilon) > 0.0:
-        k = 1
+        m = 1
 
     # Calcular o gradiente de F
     for i in range(0,num_variaveis):
@@ -688,6 +688,9 @@ def Gradiente (funcao, ponto_inicial, epsilon):
     norma_grad = math.sqrt(norma_grad)
 
     while(float(norma_grad) > float(epsilon)):
+        # incrementa o número de iterações
+        m += 1   
+
         # zera a variavel da norma
         norma_grad = 0.0
 
@@ -695,14 +698,17 @@ def Gradiente (funcao, ponto_inicial, epsilon):
         for i in range(0,num_variaveis):
             d[i][0] = - gradienteF[i][0]
 
-        # Calcula a função de min f(x+lambda*d)
-        for i in range(0,num_variaveis):
-            min_f[i][0] = '(' + str(x[i][0]) + '+' + str(d[i][0]) + '*x' + ')'
-
-        # Substituir na função os valores da função min f
-        nova_funcao = funcao
-        for i in range(0,num_variaveis):
-            nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
+        for k in range(0, num_variaveis):
+            
+            # Faz o formato da função de min f(x+lambda*d)
+            for i in range(0,num_variaveis):
+                min_f[i][0] = '(' + str(x[i][0]) + '+' + str(d[i][0]) + '*x' + ')'
+            
+            # Substituir na função os valores da função min f
+            nova_funcao = str(funcao)
+            
+            for i in range(0,num_variaveis):
+                nova_funcao = nova_funcao.replace(str(variaveis[i]), str(min_f[i][0]))
      
         # Determina o valor de lambda 
             l = float(MetodoNewton(nova_funcao, x[0][0]))
@@ -724,16 +730,13 @@ def Gradiente (funcao, ponto_inicial, epsilon):
             resultado = np.longfloat(parser.parse(gradiente[i][0]).evaluate(entrada))
             gradienteF[i][0] = resultado
             norma_grad += resultado**2
-        norma_grad = math.sqrt(norma_grad)
-        
-        # incrementa o número de iterações
-        k = k + 1    
+        norma_grad = math.sqrt(norma_grad) 
 
     #Determina valor de f(x)
     for i in range(0,num_variaveis):
             entrada[variaveis[i]] = x[i][0]
     y = float(parser.parse(funcao).evaluate(entrada))
-    return (k, x, y, num_variaveis)
+    return (m, x, y, num_variaveis)
 
 #Filtra o método de Newton:
 def FiltraMetodoNewton(funcao, x):
