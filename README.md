@@ -1,5 +1,5 @@
 # POII - Trabalho02: Programação Não Linear Multivariável Irrestrito
-Desenvolvimento dos métodos para determinação de ponto mínimo de problemas não lineares, multivariáveis e irrestrito. As rotinas desenvolvidas são: Hooke &amp; Jeeves, Newton, Gradiente, Fletcher &amp; Reeves e Davidon-Fletcher-Powell.
+Desenvolvimento dos métodos para determinação de ponto mínimo de problemas não lineares, multivariáveis e irrestrito. As rotinas desenvolvidas são: Hooke & Jeeves, Newton, Gradiente, Fletcher & Reeves e Davidon-Fletcher-Powell.
 
 
 ### Como abrir o executável do projeto: ###
@@ -20,13 +20,13 @@ Trabalho realizado em Python 3.
 
 O trabalho apresenta o desenvolvimento de um programa que determina o ponto de mínimo de uma função sem restrições, sendo resolvida por um dos métodos abaixo:
     
-    1. Hooke &amp; Jeeves
+    1. Hooke & Jeeves
     
     2. Newton 
     
     3. Gradiente 
     
-    4. Fletcher &amp; Reeves 
+    4. Fletcher & Reeves 
     
     5. Davidon-Fletcher-Powell
     
