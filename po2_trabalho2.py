@@ -540,7 +540,6 @@ def DecomposicaoLU (A, X, B, ordem):
             Y[i][0] -= L[i][j]*Y[j][0]
         Y[i][0] /= L[i][i]
     
-    #SistemaTriangularInferior(ordem,L,b,y);
     #resolvendo sistema triangular superior
     X[ordem-1][0] = Y[ordem-1][0]/U[ordem-1][ordem-1]
     for i in range (ordem-2, -1, -1):
@@ -548,7 +547,6 @@ def DecomposicaoLU (A, X, B, ordem):
         for j in range (i+1, ordem):
             X[i][0] -= U[i][j]*X[j][0]
         X[i][0] /= U[i][i]
-	#SistemaTriangularSuperior(ordem,U,y,x);
 
 # Rotina - Newton
 def Newton(funcao, ponto_inicial, epsilon):
