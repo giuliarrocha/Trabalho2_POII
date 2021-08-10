@@ -3,10 +3,10 @@ Desenvolvimento dos métodos para determinação de ponto mínimo de problemas n
 
 
 ### Como abrir o executável do projeto: ###
-Trabalho2_POII-main > dist > po2_trabalho2 > po2_trabalho2.exe
+dist > po2_trabalho2 > po2_trabalho2.exe
 
 ### Como abrir o fonte do projeto: ###
-Trabalho2_POII-main > po2_trabalho2.py
+po2_trabalho2.py
 
 #### Grupo: ####
 Giulia Rossatto Rocha - RA: 191025372
