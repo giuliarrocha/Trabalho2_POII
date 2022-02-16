@@ -9,11 +9,11 @@ dist > po2_trabalho2 > po2_trabalho2.exe
 po2_trabalho2.py
 
 #### Grupo: ####
-Giulia Rossatto Rocha - RA: 191025372
+Giulia Rossatto Rocha
 
-Larissa de Castro Bonadio - RA: 191020222
+Larissa de Castro Bonadio
 
-Larissa Mayumi Barela Hondo - RA: 191026123
+Larissa Mayumi Barela Hondo
 
 #### Informações: ####
 Trabalho realizado em Python 3.
